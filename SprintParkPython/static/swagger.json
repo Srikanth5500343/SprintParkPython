@@ -1,0 +1,314 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SprintPark API",
+    "description": "API documentation for SprintPark website",
+    "version": "1.0.0"
+  },
+  "host": "127.0.0.1:5202",
+  "schemes": ["http"],
+  "paths": {
+    "/signup": {
+      "post": {
+        "summary": "User Signup",
+        "description": "Registers a new user with the provided details.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "User signup details",
+            "schema": {
+              "type": "object",
+              "required": [
+                "username", "email", "password", "fullName", "designation",
+                "reportingManager", "employeeID", "mobileNumber",
+                "location", "dateofBirth", "bloodGroup"
+              ],
+              "properties": {
+                "username": { "type": "string" },
+                "email": { "type": "string", "format": "email" },
+                "password": { "type": "string", "format": "password" },
+                "fullName": { "type": "string" },
+                "designation": { "type": "string" },
+                "reportingManager": { "type": "string" },
+                "employeeID": { "type": "string" },
+                "mobileNumber": { "type": "string" },
+                "location": { "type": "string" },
+                "dateofBirth": { "type": "string", "format": "date" },
+                "bloodGroup": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "User signed up successfully." },
+          "400": { "description": "Invalid request or missing fields." },
+          "409": { "description": "User already exists." }
+        }
+      }
+    },
+    "/signin": {
+      "post": {
+        "summary": "User Signin",
+        "description": "Allows users to sign in with their username and password.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "User credentials",
+            "schema": {
+              "type": "object",
+              "required": ["username", "password"],
+              "properties": {
+                "username": { "type": "string" },
+                "password": { "type": "string", "format": "password" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Signin successful." },
+          "400": { "description": "Invalid JSON format or missing fields." },
+          "404": { "description": "User does not exist." },
+          "403": { "description": "Account is not active." },
+          "401": { "description": "Invalid password." }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "summary": "Forgot Password",
+        "description": "Checks if the user exists before resetting password.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Forgot password details",
+            "schema": {
+              "type": "object",
+              "required": ["username"],
+              "properties": {
+                "username": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User exists, proceed to reset password." },
+          "404": { "description": "Username not found." }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Reset Password",
+        "description": "Resets a user's password.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Reset password details",
+            "schema": {
+              "type": "object",
+              "required": ["username", "new_password", "confirm_password"],
+              "properties": {
+                "username": { "type": "string" },
+                "new_password": { "type": "string", "format": "password" },
+                "confirm_password": { "type": "string", "format": "password" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Password reset successful." },
+          "400": { "description": "Passwords do not match or weak password." },
+          "404": { "description": "Username not found." }
+        }
+      }
+    },
+    "/getAllEmployees": {
+      "get": {
+        "summary": "Get All Employees",
+        "description": "Retrieves a list of all employees.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": { "description": "A list of employees." },
+          "500": { "description": "Database connection failed." }
+        }
+      }
+    },
+    "/pdf/upload": {
+      "post": {
+        "summary": "Upload PDF",
+        "description": "Uploads a PDF file.",
+        "parameters": [
+          { "in": "formData", "name": "user_id", "type": "integer", "required": true },
+          { "in": "formData", "name": "file", "type": "file", "required": true }
+        ],
+        "responses": {
+          "200": { "description": "File uploaded successfully." },
+          "400": { "description": "Validation error." }
+        }
+      }
+    },
+    "/pdf/view_all": {
+    "get": {
+      "summary": "View All PDFs",
+      "description": "Fetch a list of all stored PDF files and their download links.",
+      "produces": ["application/json"],
+      "responses": {
+        "200": {
+          "description": "List of PDFs returned successfully.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file_name": { "type": "string" },
+                "download_url": { "type": "string" }
+              }
+            }
+          }
+        },
+        "404": { "description": "No PDFs found." }
+      }
+    }
+    },
+    "/pdf/download/{user_id}": {
+      "get": {
+        "summary": "Download PDF",
+        "description": "Downloads the uploaded PDF.",
+        "parameters": [
+          { "in": "path", "name": "user_id", "type": "integer", "required": true }
+        ],
+        "responses": {
+          "200": { "description": "Returns PDF file." },
+          "404": { "description": "No file found." }
+        }
+      }
+    },
+    "/leaves": {
+      "get": {
+        "summary": "Get user leaves",
+        "description": "Fetch the leave records for an authenticated user.",
+        "security": [{ "Bearer": [] }],
+        "tags": ["Leaves"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "JWT token required for authentication"
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": true,
+            "type": "integer",
+            "description": "User ID for fetching leave records"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of leave records",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "leaves": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "leave_id": { "type": "integer" },
+                      "user_id": { "type": "integer" },
+                      "type": { "type": "string" },
+                      "start_date": { "type": "string", "format": "date" },
+                      "end_date": { "type": "string", "format": "date" },
+                      "days": { "type": "integer" },
+                      "applied_on": { "type": "string", "format": "date-time" },
+                      "status": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized - Invalid or missing token" },
+          "404": { "description": "No leave records found" }
+        }
+      }
+    },
+    "/attendance": {
+    "get": {
+      "summary": "Get Attendance Records",
+      "description": "Retrieves attendance records based on optional filters like user_id and date. Requires authentication.",
+      "produces": ["application/json"],
+      "security": [{ "Bearer": [] }],
+      "tags": ["Attendance"],
+      "parameters": [
+        {
+          "in": "header",
+          "name": "Authorization",
+          "required": true,
+          "type": "string",
+          "description": "JWT token required for authentication"
+        },
+        {
+          "in": "query",
+          "name": "user_id",
+          "required": true,
+          "type": "integer",
+          "description": "User ID for fetching attendance records"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Attendance records retrieved successfully.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attendance_id": { "type": "integer" },
+                "user_id": { "type": "integer" },
+                "date": { "type": "string", "format": "date" },
+                "status": { 
+                  "type": "string",
+                  "enum": ["Present", "Absent", "Leave"]
+                }
+              }
+            }
+          }
+        },
+        "401": { "description": "Unauthorized - Invalid or missing token" },
+        "403": { "description": "Forbidden - Insufficient permissions" },
+        "404": { "description": "Not Found - User ID does not exist" },
+        "500": { "description": "Internal server error" }
+      }
+    }
+  }
+}
+}
+
+
+
+  
+
+
+
+  
+
+
